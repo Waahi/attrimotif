@@ -2,6 +2,7 @@ cff-version: 1.2.0
 message: "If you use attrimotif, please cite the software and the accompanying paper."
 title: "attrimotif: An attributed directed bipartite motif inference workflow in Python"
 version: 1.0.0
+doi: 10.5281/zenodo.21239426
 license: MIT
 repository-code: "https://github.com/Waahi/attrimotif"
 authors:

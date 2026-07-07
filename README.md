@@ -3,6 +3,7 @@
 ![CI](https://github.com/Waahi/attrimotif/actions/workflows/ci.yml/badge.svg)
 ![coverage](https://img.shields.io/badge/coverage-95%25-brightgreen)
 ![license](https://img.shields.io/badge/license-MIT-blue)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.21239426.svg)](https://doi.org/10.5281/zenodo.21239426)
 
 **An attributed directed bipartite motif inference workflow in Python.**
 
