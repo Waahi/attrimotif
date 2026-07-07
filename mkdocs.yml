@@ -1,0 +1,9 @@
+site_name: attrimotif
+site_description: An attributed directed bipartite motif inference workflow in Python
+repo_url: https://github.com/Waahi/attrimotif
+theme:
+  name: readthedocs
+nav:
+  - Home: index.md
+  - API reference: api.md
+  - Examples: examples.md

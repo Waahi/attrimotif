@@ -1,0 +1,22 @@
+{
+  "title": "attrimotif: An attributed directed bipartite motif inference workflow in Python",
+  "description": "A dependency-light Python workflow for attributed directed bipartite networks: a node-attributed bipartite motif census, node-category stratification and the attribute operator Phi, a degree-preserving null with a null-identifiability diagnostic, and panel-level Portrait Divergence with a permutation test. The package ships only synthetic generators and reads user-supplied or public-download data; no proprietary data are included or required.",
+  "upload_type": "software",
+  "license": "MIT",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Shao, Tengfei",
+      "affiliation": "Waseda University"
+    }
+  ],
+  "keywords": [
+    "network motifs",
+    "bipartite networks",
+    "node attributes",
+    "null models",
+    "portrait divergence",
+    "reproducible research"
+  ],
+  "version": "1.0.0"
+}

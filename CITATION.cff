@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you use attrimotif, please cite the software and the accompanying paper."
+title: "attrimotif: An attributed directed bipartite motif inference workflow in Python"
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/Waahi/attrimotif"
+authors:
+  - family-names: Shao
+    given-names: Tengfei
+    affiliation: "Waseda University"
+    email: shaotengfei123@gmail.com
+keywords:
+  - network motifs
+  - bipartite networks
+  - node attributes
+  - null models
+  - portrait divergence
+preferred-citation:
+  type: article
+  title: "attrimotif: An attributed directed bipartite motif inference workflow in Python"
+  authors:
+    - family-names: Shao
+      given-names: Tengfei
+  journal: "SoftwareX"
+  year: 2026
+  # DOI to be added on acceptance

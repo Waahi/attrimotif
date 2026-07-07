@@ -1,0 +1,28 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "name": "attrimotif",
+  "description": "An attributed directed bipartite motif inference workflow in Python: node-attributed bipartite motif census, a degree-preserving null with a null-identifiability diagnostic, operator Phi for per-class attribute distributions, and panel-level Portrait Divergence permutation testing.",
+  "version": "1.0.0",
+  "license": "https://spdx.org/licenses/MIT",
+  "programmingLanguage": "Python",
+  "runtimePlatform": "Python 3",
+  "codeRepository": "https://github.com/Waahi/attrimotif",
+  "keywords": [
+    "network motifs",
+    "bipartite networks",
+    "node attributes",
+    "null models",
+    "portrait divergence",
+    "reproducible research"
+  ],
+  "softwareRequirements": ["numpy>=1.21", "scipy>=1.7", "networkx>=2.6"],
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Tengfei",
+      "familyName": "Shao",
+      "affiliation": { "@type": "Organization", "name": "Waseda University" }
+    }
+  ]
+}

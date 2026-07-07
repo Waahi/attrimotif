@@ -1,0 +1,21 @@
+# Metadata and project docs
+include README.md
+include LICENSE
+include LICENSE.txt
+include CHANGELOG.md
+include CITATION.cff
+include codemeta.json
+
+# Documentation, examples, and tests in the source distribution
+graft docs
+graft examples
+graft tests
+
+# Exclude generated / heavy / non-source artifacts
+prune examples/data
+prune examples/output
+prune site
+prune dist
+prune build
+global-exclude *.py[cod]
+global-exclude __pycache__

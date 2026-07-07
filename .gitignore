@@ -1,0 +1,37 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# ---- Example outputs / downloaded data ----
+examples/output/
+examples/data/
+site/
+*.tmp
+
+# ---- HARD DENYLIST: proprietary / non-public data must never be committed ----
+# This package ships only synthetic and public-download data. The patterns below
+# block the confidential second-hand-luxury source material from ever entering
+# the public repository, even if a working copy is present on disk.
+POSデータ*.xlsx
+POS*.xlsx
+*POS*data*.xlsx
+sales_enriched.parquet
+sales.parquet
+transactions_all.parquet
+buyins.parquet
+buyer_*.parquet
+store_features.parquet
+*_PRIVATE_*.csv
+*buyer_id_map*.csv
+edgelist_buyer*.csv
+edgelist_brand_store*.csv
+data/tourism_network.csv
