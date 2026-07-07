@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>API reference - attrimotif</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "API reference";
+        var mkdocs_page_input_path = "api.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> attrimotif
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="#">API reference</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#graph-container">Graph container</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#bipartitedigraphedges-agent_typenone-object_typenone-edge_attrnone">BipartiteDiGraph(edges, agent_type=None, object_type=None, edge_attr=None)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#census-attrimotifcensus">Census (attrimotif.census)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#typed-attrimotiftyped">Typed (attrimotif.typed)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#nulls-attrimotifnulls">Nulls (attrimotif.nulls)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#compare-attrimotifcompare">Compare (attrimotif.compare)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#datasets-attrimotifdatasets">Datasets (attrimotif.datasets)</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../examples/">Examples</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">attrimotif</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">API reference</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/Waahi/attrimotif/edit/master/docs/api.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="api-reference">API reference</h1>
+<p>All public entry points are exported from the top-level <code>attrimotif</code> namespace.
+Every function is deterministic under a fixed <code>seed</code>.</p>
+<h2 id="graph-container">Graph container</h2>
+<h3 id="bipartitedigraphedges-agent_typenone-object_typenone-edge_attrnone"><code>BipartiteDiGraph(edges, agent_type=None, object_type=None, edge_attr=None)</code></h3>
+<p>A directed bipartite graph of agents to objects.</p>
+<ul>
+<li><code>edges</code>: iterable of <code>(agent, object)</code> arcs. Duplicates are allowed but collapse
+  for all topological counts; aggregate repeated observations into <code>edge_attr</code>
+  before construction.</li>
+<li><code>agent_type</code>, <code>object_type</code>: optional <code>{node: category}</code> maps.</li>
+<li><code>edge_attr</code>: optional <code>{(agent, object): float}</code> map (one value per arc).</li>
+</ul>
+<p>Key methods: <code>adjacency()</code> returns <code>(out, inn)</code> sets; <code>agents()</code>, <code>objects()</code>;
+<code>agent_degrees()</code>, <code>object_degrees()</code>; <code>subgraph_agents(keep)</code> returns the induced
+sub-bipartite-graph; <code>project_objects(min_shared=2)</code> returns a <code>networkx.Graph</code>
+of the object-object co-occurrence (an edge when two objects share at least
+<code>min_shared</code> agents; isolates removed). <code>project_objects</code> raises <code>ImportError</code> if
+<code>networkx</code> is unavailable.</p>
+<p><code>from_edgelist(edges, **kwargs)</code> is a convenience constructor.</p>
+<h2 id="census-attrimotifcensus">Census (<code>attrimotif.census</code>)</h2>
+<ul>
+<li><code>census(g)</code> -&gt; <code>dict</code> with keys <code>fan-out</code>, <code>fan-in</code>, <code>fan-out4</code>, <code>fan-in4</code>,
+  <code>overlap</code> (integer counts). Counts are on the simple bipartite graph; <code>overlap</code>
+  counts 2x2 subinstances, not maximal bicliques.</li>
+<li><code>size3_counts(edges)</code>, <code>size4_fan_counts(edges)</code>, <code>overlap_count(edges)</code> operate
+  on a raw edge list and return the same statistics piecewise.</li>
+<li><code>enumerate_size3(edges)</code> -&gt; <code>{class: [instance, ...]}</code>.</li>
+<li><code>directed_triadic_census(digraph)</code> -&gt; <code>dict</code>; passthrough to
+  <code>networkx.triadic_census</code>; raises <code>TypeError</code> if not a <code>networkx.DiGraph</code>.</li>
+<li><code>STATISTICS</code>: <code>{name: callable(edges) -&gt; scalar}</code> registry used by <code>null_test</code>.</li>
+</ul>
+<h2 id="typed-attrimotiftyped">Typed (<code>attrimotif.typed</code>)</h2>
+<ul>
+<li><code>stratified_census(g)</code> -&gt; <code>{"fan-out": {agent_category: count}, "fan-in":
+  {object_category: count}}</code>; nodes without a type appear under <code>None</code>.</li>
+<li><code>phi_distributions(g, reduce=np.mean)</code> -&gt; <code>{class: np.ndarray}</code>; the operator
+  Phi, the per-class distribution of <code>reduce</code> applied to each instance's two arc
+  attributes. Instances with a missing attribute are skipped.</li>
+<li><code>tail_summary(x)</code> -&gt; <code>dict</code> (<code>n</code>, <code>mean</code>, <code>sd</code>, <code>p95</code>, <code>p99</code>, <code>max</code>, <code>skew</code>).</li>
+</ul>
+<h2 id="nulls-attrimotifnulls">Nulls (<code>attrimotif.nulls</code>)</h2>
+<ul>
+<li><code>degree_swap(edges, n_swaps, rng, return_count=False)</code> -&gt; swapped edge list
+  (or <code>(edges, realized_count)</code> when <code>return_count=True</code>). Preserves both-side
+  degrees; produces a simple graph.</li>
+<li><code>null_test(g_or_edges, statistic, n_samples=500, swaps_per=None, seed=0,
+  alternative="greater", stat_func=None)</code> -&gt; <code>dict</code> with <code>statistic</code>, <code>observed</code>,
+  <code>null_mean</code>, <code>null_sd</code>, <code>z</code>, <code>perm_p</code> (equal to <code>(r + 1) / (n_samples + 1)</code>),
+  <code>identifiable</code> (<code>False</code> for degree-determined statistics), <code>mean_swap_ratio</code>
+  (mixing diagnostic), and <code>note</code>. Raises <code>ValueError</code> for an unknown
+  <code>alternative</code> (allowed: <code>greater</code>, <code>less</code>, <code>two-sided</code>), for <code>n_samples &lt;= 0</code>,
+  or for a <code>statistic</code> absent from <code>STATISTICS</code> when no <code>stat_func</code> is given.</li>
+<li><code>is_degree_determined(statistic)</code> -&gt; <code>(bool, explanation)</code>; the
+  null-identifiability diagnostic.</li>
+<li><code>holm_bonferroni(pvals)</code>, <code>benjamini_hochberg(pvals)</code> -&gt; monotone adjusted
+  p-values clipped to 1.</li>
+</ul>
+<h2 id="compare-attrimotifcompare">Compare (<code>attrimotif.compare</code>)</h2>
+<ul>
+<li><code>portrait_matrix(graph)</code> -&gt; the network portrait B-matrix (<code>numpy.ndarray</code>).</li>
+<li><code>portrait_divergence(g1, g2, backend="builtin")</code> -&gt; <code>float</code> in <code>[0, 1]</code> (0 for
+  identical graphs; two empty graphs score 0, empty-vs-non-empty scores 1).
+  <code>backend="netrd"</code> delegates to <code>netrd.distance.PortraitDivergence</code> (optional
+  dependency); any other value raises <code>ValueError</code>. Edge weights are ignored.</li>
+<li><code>panel_divergence_matrix(graphs)</code> -&gt; <code>{(label_a, label_b): float}</code> over a
+  <code>{label: networkx graph}</code> map.</li>
+<li><code>panel_permutation_test(g, agent_panel, n_samples=500, min_shared=2, seed=0,
+  alternative="greater")</code> -&gt; <code>{(label_a, label_b): {observed, null_mean,
+  null_p95, perm_p}}</code>. Reassigns agents to panels (preserving panel sizes) to
+  build the null. Raises <code>ValueError</code> for an unknown <code>alternative</code> or for
+  <code>n_samples &lt;= 0</code>. Returns an empty dict when <code>agent_panel</code> has fewer than two
+  distinct panel labels (no pairs to compare).</li>
+</ul>
+<h2 id="datasets-attrimotifdatasets">Datasets (<code>attrimotif.datasets</code>)</h2>
+<ul>
+<li><code>planted_tail_example(seed=0)</code> -&gt; <code>BipartiteDiGraph</code> with edge-disjoint fan
+  blocks and one planted fan-out tail.</li>
+<li><code>synthetic_panel(n_panels=4, agents_per_panel=40, n_objects=24,
+  n_categories=3, tail_category=0, seed=0)</code> -&gt; <code>dict</code> with <code>graph</code>,
+  <code>agent_panel</code>, <code>panels</code>, <code>object_type</code>.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../examples/" class="btn btn-neutral float-right" title="Examples">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/Waahi/attrimotif" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../examples/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
