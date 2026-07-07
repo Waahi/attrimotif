@@ -31,7 +31,7 @@ permissively licensed (MIT), and dependency-light (`numpy`, `scipy`,
 ## Install
 
 ```bash
-pip install attrimotif          # from PyPI (planned)
+pip install attrimotif          # from PyPI
 pip install -e .[dev]           # from a checkout, with test/plot extras
 ```
 
