@@ -14,7 +14,17 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def _read(name):
-    with open(os.path.join(ROOT, name), encoding="utf-8") as f:
+    path = os.path.join(ROOT, name)
+    if not os.path.exists(path):
+        # This fired once for real: .zenodo.json was missing from MANIFEST.in,
+        # so the sdist shipped this test together with a file it did not
+        # contain, and anyone running the downloaded tests saw a bare
+        # FileNotFoundError. Say what is actually wrong instead.
+        raise AssertionError(
+            f"{name} is not present next to the package. If this is a source "
+            f"distribution, {name} is missing from MANIFEST.in: the test suite "
+            f"is shipped but the file it checks is not.")
+    with open(path, encoding="utf-8") as f:
         return f.read()
 
 

@@ -5,6 +5,9 @@ include LICENSE.txt
 include CHANGELOG.md
 include CITATION.cff
 include codemeta.json
+# read by tests/test_version_consistency.py: omitting it shipped an sdist
+# whose own test suite failed on a file the sdist did not contain
+include .zenodo.json
 
 # Documentation, examples, and tests in the source distribution
 graft docs
