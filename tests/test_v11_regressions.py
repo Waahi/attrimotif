@@ -489,7 +489,7 @@ def test_dense_route_refuses_when_float32_would_be_inexact(monkeypatch):
 
     monkeypatch.setattr(census, "_F32_EXACT_INT", 3)
     edges = [("a1", "o1"), ("a1", "o2"), ("a2", "o1"), ("a2", "o3")]
-    with pytest.raises(ValueError, match="2\*\*24 objects"):
+    with pytest.raises(ValueError, match=r"2\*\*24 objects"):
         census.overlap_count(edges, backend="matrix")
     # the sparse route has no such limit and must still answer
     assert census.overlap_count(edges, backend="sparse") == 0
