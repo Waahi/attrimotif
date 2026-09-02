@@ -13,6 +13,9 @@ include .zenodo.json
 graft docs
 graft examples
 graft tests
+# the scalability grid the paper's supplement reports, so the benchmark
+# is reproducible from the archived capsule rather than a private tree
+graft benchmarks
 
 # Exclude generated / heavy / non-source artifacts
 prune examples/data

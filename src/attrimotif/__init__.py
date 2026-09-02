@@ -37,7 +37,7 @@ from .nulls import (
 )
 from .typed import phi_distributions, stratified_census, tail_summary
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 __all__ = [
     "__version__",

@@ -315,8 +315,10 @@ def swap_convergence(
     realized swap ratio at each. The default chain length used by
     :func:`null_test` is ``12 * |E|``; a flat trace across multipliers spanning
     that value is the practical evidence that the reported null is not sensitive
-    to the chain length, and a swap ratio below 1 shows the chain is
-    rejection-limited rather than merely short.
+    to the chain length. The acceptance rate is not itself such a criterion:
+    it falls with density because fewer swaps are legal, not because anything
+    is wrong. What matters is how many accepted moves the budget buys per arc,
+    ``budget * acceptance / |E|``.
 
     This is a diagnostic, not a convergence proof: no mixing-time or
     spectral-gap bound is claimed for the bipartite swap chain on an arbitrary

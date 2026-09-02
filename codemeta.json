@@ -3,7 +3,7 @@
   "@type": "SoftwareSourceCode",
   "name": "attrimotif",
   "description": "An attributed directed bipartite motif inference workflow in Python: node-attributed bipartite motif census, a degree-preserving null with a null-identifiability diagnostic, operator Phi for per-class attribute distributions, and panel-level Portrait Divergence permutation testing.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "license": "https://spdx.org/licenses/MIT",
   "programmingLanguage": "Python",
   "runtimePlatform": "Python 3",

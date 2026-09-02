@@ -5,12 +5,49 @@ Keep a Changelog, and the project adheres to Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-09
+
+A patch release. No runtime behaviour changes; nothing reported anywhere moves.
+
+### Fixed
+- The source distribution shipped `tests/test_version_consistency.py` without
+  the `.zenodo.json` it reads, so anyone who downloaded the sdist and ran the
+  suite got a `FileNotFoundError` from a test the package advertises as passing.
+  `MANIFEST.in` now includes it, and the reader names `MANIFEST.in` when a
+  metadata file is absent instead of letting a bare traceback stand for the
+  diagnosis. Found by installing the built wheel into a clean environment and
+  running the shipped tests against it, which is the only way it shows up: in
+  the source tree the file is always there.
+- The generator checksums asserted the arc sequence and the float attributes
+  under one digest and called it platform-stable. It is not: CI went red on
+  macOS for 1.1.0 while all eight Linux and Windows jobs passed, on exactly the
+  two generators that draw attributes from `rng.normal`. The arc sequences are
+  identical everywhere; the attribute values differ below the ninth decimal
+  place. The contract is now split, with the arc sequence asserted across
+  platforms and the attributes pinned at nine decimal places, and a failure
+  says which half moved.
+- `swap_convergence`'s docstring still carried the interpretive criterion the
+  1.1.0 release notes withdraw, telling readers that an acceptance rate below 1
+  means the chain is rejection-limited. It falls with density because fewer
+  swaps are legal; what matters is accepted moves per arc.
+
+### Added
+- `benchmarks/bench_scaling.py` and its measured grid, so the scalability
+  results reported in the accompanying paper's supplement are reproducible from
+  the archived release rather than from a path in the author's working tree.
+  The grid now separates the census as the public API runs it, with the overlap
+  on `backend="auto"`, from the same census with the overlap forced sparse: the
+  first completes every cell and peaks at 2957 MiB, the second stays at or
+  below 221 MiB and does not finish the two densest cells.
+
 ## [1.1.0] - 2026-09
 Revision release prepared in response to the SoftwareX peer review of the
-accompanying manuscript. One change moves every reported null result, and it is
-the first entry below. The other changes do not: the promoted generator
-reproduces the previous example graph arc for arc, and the closed-form census
-and the portrait cache were verified bit-identical to the v1.0.0 outputs.
+accompanying manuscript. Two changes move results and are the first two
+entries below: the null sampler, which moves every reported null result, and the
+two-sided permutation p-value, which moves results for anyone who asked for that
+alternative. The remaining changes do not: the promoted generator reproduces the
+previous example graph arc for arc, and the closed-form census and the portrait
+cache were verified bit-identical to the v1.0.0 outputs.
 
 ### Fixed (this changes results, please re-run)
 - **The fixed-margin null was not sampling uniformly.** `degree_swap` ran until a
@@ -32,6 +69,51 @@ and the portrait cache were verified bit-identical to the v1.0.0 outputs.
   acceptance rate rather than a completion ratio, and is also exposed under the
   clearer name `mean_acceptance_rate`: on MovieLens it reads 0.47, where the
   1.0.0 field read 1.00 by construction.
+
+- **The two-sided permutation p-value was not exact.** Under
+  `alternative="two-sided"`, `null_test` and `panel_permutation_test` measured
+  extremeness from the mean of the replicates alone, leaving the observed value
+  out of the centre. The `(r+1)/(R+1)` estimator is exact only when the ranking
+  is a symmetric function of the pooled set, so this broke the finite-R Type-I
+  guarantee: calibrated under a true null at R = 19 it rejected at 0.062 against
+  a nominal 0.05 on normal data and 0.057 on Poisson counts. Both now centre on
+  the pooled set, observed value included, which holds the level (0.050 and
+  0.046 in the same calibration). **If you reported a two-sided p-value from
+  1.0.0, re-run it.** The one-sided paths are unchanged, and every result in the
+  accompanying manuscript uses `alternative="greater"`, so no published number
+  moves. The calibration is in
+  `revision_2026-09/calibrate_two_sided.py` and pinned by
+  `tests/test_v11_regressions.py`.
+
+- **The two-sided permutation p-value was not exact.** Under
+  `alternative="two-sided"`, `null_test` and `panel_permutation_test` measured
+  extremeness from the mean of the replicates alone, leaving the observed value
+  out of the centre. The `(r+1)/(R+1)` estimator is exact only when the ranking
+  is a symmetric function of the pooled set, so this broke the finite-R Type-I
+  guarantee: calibrated under a true null at R = 19 it rejected at 0.062 against
+  a nominal 0.05 on normal data and 0.057 on Poisson counts. Both now centre on
+  the pooled set, observed value included, which holds the level (0.050 and
+  0.046 in the same calibration). **If you reported a two-sided p-value from
+  1.0.0, re-run it.** The one-sided paths are unchanged, and every result in the
+  accompanying manuscript uses `alternative="greater"`, so no published number
+  moves. The calibration is in
+  `revision_2026-09/calibrate_two_sided.py` and pinned by
+  `tests/test_v11_regressions.py`.
+
+- **The two-sided permutation p-value was not exact.** Under
+  `alternative="two-sided"`, `null_test` and `panel_permutation_test` measured
+  extremeness from the mean of the replicates alone, leaving the observed value
+  out of the centre. The `(r+1)/(R+1)` estimator is exact only when the ranking
+  is a symmetric function of the pooled set, so this broke the finite-R Type-I
+  guarantee: calibrated under a true null at R = 19 it rejected at 0.062 against
+  a nominal 0.05 on normal data and 0.057 on Poisson counts. Both now centre on
+  the pooled set, observed value included, which holds the level (0.050 and
+  0.046 in the same calibration). **If you reported a two-sided p-value from
+  1.0.0, re-run it.** The one-sided paths are unchanged, and every result in the
+  accompanying manuscript uses `alternative="greater"`, so no published number
+  moves. The calibration is in
+  `revision_2026-09/calibrate_two_sided.py` and pinned by
+  `tests/test_v11_regressions.py`.
 
 ### Changed (behaviour-affecting, please read)
 - **`null_test` no longer reports `identifiable=True` by default for a
