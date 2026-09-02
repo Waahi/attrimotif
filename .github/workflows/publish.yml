@@ -1,0 +1,92 @@
+name: Publish to PyPI
+
+# Trusted Publishing (OIDC). No API token is stored anywhere: GitHub mints a
+# short-lived identity token for this workflow and PyPI accepts it because the
+# project lists this exact repository and workflow file as a trusted publisher.
+# Nothing here is a secret, and there is no secret to leak or to lose.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to build and publish (e.g. v1.1.1)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build and check the distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # build from the tag, not from whatever main happens to be
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tooling
+        run: python -m pip install --upgrade build twine
+
+      - name: Build
+        run: python -m build
+
+      - name: Check the distributions
+        run: python -m twine check dist/*
+
+      - name: The built version must match the tag
+        # A tag and a version that disagree is how a release ends up describing
+        # code it does not contain. Fail here rather than on PyPI, where the
+        # version number is permanent.
+        run: |
+          TAG="${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}"
+          EXPECTED="${TAG#v}"
+          BUILT=$(ls dist/*.tar.gz | sed -E 's/.*attrimotif-(.+)\.tar\.gz/\1/')
+          echo "tag=$TAG expected=$EXPECTED built=$BUILT"
+          test "$EXPECTED" = "$BUILT"
+
+      - name: The sdist must carry what the tests and the paper need
+        # 1.1.0 shipped tests/test_version_consistency.py without the
+        # .zenodo.json it reads, so the suite this project advertises as passing
+        # failed for anyone who downloaded the sdist. Check it here.
+        run: |
+          mkdir -p _check && tar -xzf dist/*.tar.gz -C _check
+          D=$(echo _check/attrimotif-*)
+          for f in .zenodo.json benchmarks/bench_scaling.py tests/test_version_consistency.py; do
+            test -f "$D/$f" || { echo "sdist is missing $f"; exit 1; }
+          done
+          echo "sdist contents ok"
+
+      - name: The wheel must install clean and pass the shipped tests
+        run: |
+          python -m venv /tmp/v && /tmp/v/bin/python -m pip install -q dist/*.whl pytest
+          D=$(echo _check/attrimotif-*)
+          cd "$D" && /tmp/v/bin/python -m pytest -q tests
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Upload to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      # this is what Trusted Publishing needs, and it is the only privilege
+      # this job has: no repository write, no secrets
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - uses: pypa/gh-action-pypi-publish@release/v1
