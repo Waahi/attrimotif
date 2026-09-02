@@ -46,13 +46,43 @@ def test_fan_counts_are_invariant_under_degree_preserving_null():
 
 
 def test_overlap_is_identifiable_and_detected_when_planted():
-    # two agents sharing three objects create genuine overlap beyond degree
-    edges = [("x", o) for o in (1, 2, 3)] + [("y", o) for o in (1, 2, 3)]
-    edges += [("z1", 1), ("z2", 2), ("z3", 3)]  # add degree without overlap
-    res = am.null_test(edges, "overlap", n_samples=200, seed=0)
+    # A clustered core over a shared object set creates overlap beyond what the
+    # degree sequence forces, so the same null does carry power here.
+    g = am.datasets.clustered_core_rim(seed=0)
+    res = am.null_test(g, "overlap", n_samples=200, seed=0)
     assert res["identifiable"] is True
-    assert res["observed"] >= res["null_mean"]
+    assert res["degree_determined"] is False
+    assert res["null_degenerate"] is False
+    assert res["identifiability_route"] == "empirical-variable"
+    assert res["observed"] > res["null_mean"]
+    assert res["null_sd"] > 0
     assert 0.0 < res["perm_p"] <= 1.0
+
+
+def test_overlap_null_is_degenerate_on_a_forced_degree_sequence():
+    """A non-degree-determined statistic can still have a degenerate null.
+
+    ``x`` and ``y`` both have degree 3 over exactly three objects, so both are
+    forced onto all of them and the rim agents only permute; every realisation
+    of this degree sequence has the same overlap count. Swaps are accepted
+    (ratio ~ 1) yet the statistic never moves, so the null has no power here
+    even though ``overlap`` is not a function of the degree sequence in general.
+    The guard must report that without claiming a degree-determinacy proof.
+    """
+    edges = [("x", o) for o in (1, 2, 3)] + [("y", o) for o in (1, 2, 3)]
+    edges += [("z1", 1), ("z2", 2), ("z3", 3)]
+    res = am.null_test(edges, "overlap", n_samples=200, seed=0)
+    assert res["null_sd"] == 0.0
+    # the chain does move: proposals are being accepted, they just never change
+    # the statistic, because every realisation of this fibre has the same value
+    assert res["mean_acceptance_rate"] > 0.0
+    assert res["identifiable"] is False          # ... but the null has no power
+    assert res["null_degenerate"] is True
+    assert res["degree_determined"] is False     # NOT claimed as a proof
+    assert res["identifiability_route"] == "empirical-degenerate"
+    # the note must decline to call this a proof
+    assert "does not prove" in res["note"]
+    assert "exact degree-sequence" not in res["note"]
 
 
 def test_multiplicity_corrections_are_monotone_and_conservative():

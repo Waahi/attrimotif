@@ -24,7 +24,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e .[dev] pytest-cov
       - name: Run tests with coverage
-        run: pytest --cov=attrimotif --cov-report=term-missing
+        run: pytest --cov=attrimotif --cov-report=term-missing --cov-fail-under=95
       - name: Run all illustrative examples end to end
         run: python examples/run_all.py
 

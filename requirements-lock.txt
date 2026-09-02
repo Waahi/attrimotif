@@ -1,0 +1,17 @@
+# attrimotif reference environment (exact resolved versions).
+#
+# This file exists to make a reported run reproducible. It is NOT a substitute
+# for the dependency declaration in pyproject.toml, which deliberately keeps
+# floor-only constraints (numpy>=1.21, scipy>=1.7, networkx>=2.6): a library
+# must not pin its consumers' transitive dependency graph. Install this file
+# only when you want to reproduce the numbers the manuscript reports.
+#
+# Captured on: Python 3.12.6 / Windows AMD64
+#   pip install -r requirements-lock.txt
+
+networkx==3.2.1
+numpy==2.4.6
+scipy==1.17.1
+
+# optional, for the Portrait-Divergence cross-check:
+# netrd==0.3.0

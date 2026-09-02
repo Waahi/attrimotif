@@ -1,17 +1,28 @@
 # -*- coding: utf-8 -*-
 """Deterministic synthetic generators for the illustrative examples.
 
-No proprietary or real data ships with the package. Both generators are seeded
+No proprietary or real data ships with the package. All generators are seeded
 and fully specified here.
 
 * :func:`planted_tail_example` -- two size-3 classes with matched central
   tendency but a single high-value instance planted in ``fan-out``, so a count
   (or count + mean + percentile) cannot separate the classes but operator Phi's
   per-class distribution can.
+* :func:`clustered_core_rim` -- a clustered core of agents co-selecting a small
+  object set (genuine ``overlap``) plus a dispersed rim that adds degree without
+  co-occurrence, so the fan counts are inflated by degree alone while
+  ``overlap`` carries beyond-degree signal. Used for the null-identifiability
+  example.
 * :func:`synthetic_panel` -- a multi-network panel of attributed directed
   bipartite graphs with non-trivial object categories, an attribute tail in one
   category, and clustered vs. dispersed panels that differ in Portrait
   Divergence -- enough to exercise all four modules end to end.
+
+.. note::
+   The arc **order** these generators emit is part of their reproducible
+   contract: :func:`attrimotif.nulls.degree_swap` draws edges by positional
+   index, so a permuted arc list changes the swap trajectory (and hence the
+   null mean, sd and z) at a fixed seed even when the topology is identical.
 """
 from __future__ import annotations
 
@@ -57,6 +68,48 @@ def planted_tail_example(seed: int = 0) -> BipartiteDiGraph:
             attr[(a, o)] = float(max(rng.normal(0.30, 0.02), 1e-3))
 
     return BipartiteDiGraph(edges, edge_attr=attr)
+
+
+def clustered_core_rim(
+    seed: int = 0,
+    n_core: int = 25,
+    core_objects: int = 4,
+    core_degree: int = 3,
+    n_rim: int = 40,
+) -> BipartiteDiGraph:
+    """Clustered core plus dispersed rim: the null-identifiability example graph.
+
+    ``n_core`` agents each select ``core_degree`` distinct objects, without
+    replacement, from a shared core of ``core_objects`` objects. A rim of
+    ``n_rim`` degree-1 agents, each attached to its own private object, adds
+    degree without any co-occurrence. At the defaults the core agents share
+    objects repeatedly and so produce genuine 2x2 ``overlap`` structure; small
+    settings (for instance ``n_core=1`` or ``core_degree<2``) cannot, since
+    overlap needs two agents sharing two objects.
+
+    With the defaults the graph has 25 core agents over 4 core objects plus 40
+    rim agents, i.e. ``25 * 3 + 40 = 115`` arcs. The fan counts are then exact
+    functions of the degree sequences (a degree-preserving null cannot identify
+    them) while ``overlap`` is not, so the same null does carry power for it.
+
+    Parameters are given in full so the example is reproducible from the
+    distributed package alone.
+    """
+    if core_degree > core_objects:
+        raise ValueError("core_degree cannot exceed core_objects")
+    if min(n_core, core_objects, core_degree, n_rim) < 0:
+        raise ValueError("generator sizes must be non-negative")
+    rng = np.random.default_rng(seed)
+    edges = []
+    core = [f"o{j + 1}" for j in range(core_objects)]
+    for i in range(n_core):
+        # one rng.choice per agent, arcs appended in the order drawn: this
+        # ordering is part of the reproducible contract (see module docstring).
+        for o in rng.choice(core, size=core_degree, replace=False):
+            edges.append((f"c{i}", str(o)))
+    for i in range(n_rim):
+        edges.append((f"r{i}", f"p{i}"))
+    return BipartiteDiGraph(edges)
 
 
 def synthetic_panel(

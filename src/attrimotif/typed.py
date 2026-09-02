@@ -15,7 +15,7 @@ Two attribute-aware readings of the size-3 bipartite census:
 """
 from __future__ import annotations
 
-from typing import Callable, Dict
+from typing import Callable, Dict, Sequence
 
 import numpy as np
 
@@ -23,23 +23,44 @@ from .census import enumerate_size3
 from .graph import BipartiteDiGraph
 
 
-def stratified_census(g: BipartiteDiGraph) -> Dict[str, Dict]:
+def stratified_census(g: BipartiteDiGraph, with_support: bool = False) -> Dict[str, Dict]:
     """Size-3 motif counts stratified by hub-node category.
 
+    The stratification is keyed on the motif's **hub**, which is the shared
+    agent for ``fan-out`` and the shared object for ``fan-in``; it is not keyed
+    on one side of the graph. Categories are read from ``g.agent_type`` /
+    ``g.object_type``; nodes without a type contribute under ``None``.
+
     Returns ``{"fan-out": {agent_category: count}, "fan-in": {object_category:
-    count}}``. Categories are read from ``g.agent_type`` / ``g.object_type``;
-    nodes without a type contribute under ``None``.
+    count}}``.
+
+    With ``with_support=True`` each entry becomes ``{"instances": count,
+    "hubs": n}``, where ``hubs`` is the number of distinct hub nodes the
+    instances came from. The counts are exact either way, but a stratum whose
+    instances all come from one hub supports far less than the same count spread
+    over many, and the count alone cannot tell the two apart.
     """
     inst = enumerate_size3(g.edges)
     fanout: Dict = {}
+    fanout_hubs: Dict = {}
     for e1, _e2 in inst["fan-out"]:
         cat = g.agent_type.get(e1[0])
         fanout[cat] = fanout.get(cat, 0) + 1
+        fanout_hubs.setdefault(cat, set()).add(e1[0])
     fanin: Dict = {}
+    fanin_hubs: Dict = {}
     for e1, _e2 in inst["fan-in"]:
         cat = g.object_type.get(e1[1])
         fanin[cat] = fanin.get(cat, 0) + 1
-    return {"fan-out": fanout, "fan-in": fanin}
+        fanin_hubs.setdefault(cat, set()).add(e1[1])
+    if not with_support:
+        return {"fan-out": fanout, "fan-in": fanin}
+    return {
+        "fan-out": {c: {"instances": n, "hubs": len(fanout_hubs[c])}
+                    for c, n in fanout.items()},
+        "fan-in": {c: {"instances": n, "hubs": len(fanin_hubs[c])}
+                   for c, n in fanin.items()},
+    }
 
 
 def phi_distributions(
@@ -65,7 +86,7 @@ def phi_distributions(
     return res
 
 
-def tail_summary(x) -> Dict[str, float]:
+def tail_summary(x: Sequence[float]) -> Dict[str, float]:
     """Compact tail-aware summary of a value distribution."""
     x = np.asarray(x, dtype=float)
     if x.size == 0:

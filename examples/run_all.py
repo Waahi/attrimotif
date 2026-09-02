@@ -2,8 +2,9 @@
 """Run every illustrative example end to end.
 
 Used both as a user entry point and as a CI smoke test: examples 1-3 are fully
-synthetic and must succeed; example 4 (MovieLens) is skipped cleanly when the
-public data has not been downloaded.
+synthetic and must succeed; examples 4 and 5 (MovieLens) are skipped cleanly
+when the public data has not been downloaded. Example 5 runs in its default
+(quick) mode here; the settings the paper reports need ``--full``.
 """
 from __future__ import annotations
 
@@ -16,6 +17,7 @@ import example1_planted_tail
 import example2_null_identifiability
 import example3_synthetic_panel
 import example4_movielens
+import example5_movielens_workflow
 
 
 def main() -> int:
@@ -24,6 +26,7 @@ def main() -> int:
         ("example2", example2_null_identifiability),
         ("example3", example3_synthetic_panel),
         ("example4", example4_movielens),
+        ("example5", example5_movielens_workflow),
     ]:
         print(f"\n=== {name} ===")
         mod.main()

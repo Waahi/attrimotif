@@ -5,6 +5,96 @@ Keep a Changelog, and the project adheres to Semantic Versioning.
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09
+Revision release prepared in response to the SoftwareX peer review of the
+accompanying manuscript. One change moves every reported null result, and it is
+the first entry below. The other changes do not: the promoted generator
+reproduces the previous example graph arc for arc, and the closed-form census
+and the portrait cache were verified bit-identical to the v1.0.0 outputs.
+
+### Fixed (this changes results, please re-run)
+- **The fixed-margin null was not sampling uniformly.** `degree_swap` ran until a
+  fixed number of swaps had been *accepted*. That discards the rejection
+  self-loops and samples the embedded jump chain, whose stationary weight is
+  proportional to the number of valid moves out of each state, so graphs that
+  happen to admit more swaps were oversampled. On an exhaustively enumerated
+  3x3 fibre with both margins (2,1,1) the realised frequencies tracked the
+  valid-move counts with correlation 0.997 and a chi-square of 535 on 4 degrees
+  of freedom. The budget now counts **proposals**, so a rejected proposal is a
+  step of the chain and the self-loops are kept; the same fibre then gives a
+  chi-square of 8.5 on 4 degrees of freedom. `count="successes"` reproduces the
+  1.0.0 rule and is retained only for reproducing 1.0.0 numbers.
+
+  Every null test therefore moves. On the package's own example the size-4
+  overlap goes from z = 25.5 to z = 26.6 at an unchanged p = 1/301, and on
+  MovieLens 100K from z = 32.0 to z = 30.8 at an unchanged p = 1/201; the
+  qualitative readings are unchanged. `mean_swap_ratio` is now a genuine
+  acceptance rate rather than a completion ratio, and is also exposed under the
+  clearer name `mean_acceptance_rate`: on MovieLens it reads 0.47, where the
+  1.0.0 field read 1.00 by construction.
+
+### Changed (behaviour-affecting, please read)
+- **`null_test` no longer reports `identifiable=True` by default for a
+  statistic it cannot assess.** In v1.0.0 the identifiability verdict was a
+  lookup on the statistic *name* over four built-in fan counts, so any
+  `stat_func` a caller supplied, and any statistic whose null happened to be
+  degenerate, was reported as identifiable. The verdict is now reached by one of
+  four routes, reported in the new `identifiability_route` field:
+  `registry-proof` (exact, and now bound to the canonical shipped callable
+  rather than to the name, since `census.STATISTICS` is a mutable public
+  mapping), `empirical-degenerate` (all replicates returned the same value,
+  which flags the run and is explicitly *not* claimed as proof that the
+  statistic is degree-determined), `empirical-variable`, and `undetermined`.
+  Consequently `identifiable` is now **tri-state**: `None` when fewer than two
+  replicates were drawn or the null returned non-finite values, because neither
+  answer is supported. Code that assumed a bool should test the route, or test
+  `is True` / `is False` explicitly.
+- `null_test` validates `n_samples` and `swaps_per` as integers and rejects
+  non-positive values instead of proceeding.
+- Degeneracy is decided on the raw statistic values rather than on the float
+  array used for the moments, so two integers above 2**53 are no longer
+  collapsed into a spurious zero-variance verdict.
+
+### Added
+- `datasets.clustered_core_rim()`: the clustered-core-plus-dispersed-rim
+  generator used by the null-identifiability example, which was previously
+  built inline inside `examples/example2_null_identifiability.py` and so could
+  not be reproduced from the distributed package. Arc order is part of its
+  contract, because `degree_swap` draws edges by positional index.
+- `nulls.swap_convergence()`: the null statistic as a function of chain length
+  in multiples of the arc count, with the realized swap ratio at each, for
+  checking that a reported null is not sensitive to the number of swaps.
+- `examples/example5_movielens_workflow.py`: all four analysis modules on
+  MovieLens 100K, with `--only` to run a subset and incremental writing of
+  `--out` so an interrupted long run keeps the modules that finished.
+- `null_test` additionally returns `p_resolution` (the attainable p-value floor
+  `1 / (R + 1)`), `degree_determined`, `null_degenerate`, `n_samples` and
+  `swaps_requested`; `panel_permutation_test` additionally returns
+  `p_resolution`, `n_samples` and `min_shared`.
+
+### Performance
+- `census.size3_counts` computes the fan counts in closed form as sums of
+  binomial coefficients of the degrees instead of materialising every instance.
+  On MovieLens 100K this is 16.1 s to 0.04 s and 3.05 GiB to 17 MiB of peak
+  memory, with identical counts. `enumerate_size3` is unchanged and is still
+  what the stratified census and operator Phi consume, so their cost and memory
+  profile are unchanged.
+- `panel_permutation_test` and `panel_divergence_matrix` compute one portrait
+  per panel per assignment instead of recomputing both portraits for every
+  pair; with four panels that is a third of the portrait computations. The
+  cache is rebuilt for every replicate, so the null distribution is unaffected,
+  and the reported values are bit-identical.
+
+### Documentation
+- The `nulls` module documents all four identifiability routes and states
+  explicitly that only `registry-proof` is a proof, that the empirical routes
+  describe the finite sample drawn in a run, and that neither empirical route
+  establishes that the swap chain has mixed.
+- The realized swap ratio is described as a acceptance-rate diagnostic rather
+  than a mixing certificate.
+- `overlap_count` no longer states that a degree-preserving null is informative
+  for it unconditionally; whether it is remains graph-specific.
+
 ## [1.0.0] - 2026-07-07
 ### Added
 - Initial release candidate.

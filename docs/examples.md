@@ -35,3 +35,25 @@ p-values.
 separately) as a user-to-movie bipartite graph with genre categories, reporting
 the census and the genre-stratified fan-in counts. It exits cleanly with
 download instructions when the data is absent.
+
+## Example 5 - the complete four-module workflow on MovieLens 100K
+
+`examples/example5_movielens_workflow.py` runs all four analysis modules on the
+same real graph: the census, the genre-stratified census with operator Phi over
+the rating attribute, the degree-preserving null with the identifiability guard,
+and the panel permutation test over four user cohorts formed by the quartiles of
+each user's first-rating timestamp.
+
+```
+python example5_movielens_workflow.py --quick            # smoke run
+python example5_movielens_workflow.py --full             # reported settings
+python example5_movielens_workflow.py --full --only 4 --out r.json
+```
+
+Module 3 (the null test) and module 4 (the panel test) each take tens of minutes
+at the reported settings. `--only` runs a subset, and `--out` is rewritten after
+every module, so an interrupted run keeps the modules that finished and
+re-running with `--only` on the same `--out` resumes rather than restarts.
+
+Like example 4, it exits cleanly with instructions when the MovieLens data has
+not been downloaded.

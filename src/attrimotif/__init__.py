@@ -33,10 +33,11 @@ from .nulls import (
     holm_bonferroni,
     is_degree_determined,
     null_test,
+    swap_convergence,
 )
 from .typed import phi_distributions, stratified_census, tail_summary
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 
 __all__ = [
     "__version__",
@@ -58,6 +59,7 @@ __all__ = [
     # nulls
     "degree_swap",
     "null_test",
+    "swap_convergence",
     "is_degree_determined",
     "holm_bonferroni",
     "benjamini_hochberg",

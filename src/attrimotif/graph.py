@@ -18,7 +18,7 @@ Design notes (see the package's methodological-specification docs):
 from __future__ import annotations
 
 from itertools import combinations
-from typing import Dict, Hashable, Iterable, List, Optional, Tuple
+from typing import Any, Dict, Hashable, Iterable, List, Optional, Sequence, Tuple
 
 try:  # networkx is only needed for projection / Portrait Divergence
     import networkx as nx
@@ -125,6 +125,6 @@ class BipartiteDiGraph:
         )
 
 
-def from_edgelist(edges, **kwargs) -> BipartiteDiGraph:
+def from_edgelist(edges: Sequence[Edge], **kwargs: Any) -> BipartiteDiGraph:
     """Convenience constructor mirroring :class:`BipartiteDiGraph`."""
     return BipartiteDiGraph(edges, **kwargs)

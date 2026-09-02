@@ -36,7 +36,7 @@ except ImportError:  # pragma: no cover
 from .graph import BipartiteDiGraph
 
 
-def portrait_matrix(g) -> np.ndarray:
+def portrait_matrix(g: "nx.Graph") -> np.ndarray:
     """Network portrait B-matrix of a ``networkx`` graph."""
     if nx is None:  # pragma: no cover
         raise ImportError("networkx is required for portrait_matrix()")
@@ -88,7 +88,8 @@ def _js_from_portraits(b1: np.ndarray, b2: np.ndarray) -> float:
     )
 
 
-def portrait_divergence(g1, g2, backend: str = "builtin") -> float:
+def portrait_divergence(g1: "nx.Graph", g2: "nx.Graph",
+                        backend: str = "builtin") -> float:
     """Portrait Divergence between two ``networkx`` graphs, in ``[0, 1]``.
 
     ``backend="builtin"`` (default) uses the bundled implementation;
@@ -104,10 +105,16 @@ def portrait_divergence(g1, g2, backend: str = "builtin") -> float:
 
 
 def panel_divergence_matrix(graphs: Mapping) -> Dict[Tuple, float]:
-    """Pairwise Portrait Divergence over a mapping ``{label: networkx graph}``."""
+    """Pairwise Portrait Divergence over a mapping ``{label: networkx graph}``.
+
+    Each graph's portrait is computed once and reused across the pairs it
+    appears in, which is the same value as calling :func:`portrait_divergence`
+    per pair but avoids recomputing every portrait ``len(graphs) - 1`` times.
+    """
     labels = list(graphs.keys())
+    portraits = {lab: portrait_matrix(graphs[lab]) for lab in labels}
     return {
-        (a, b): portrait_divergence(graphs[a], graphs[b])
+        (a, b): _js_from_portraits(portraits[a], portraits[b])
         for a, b in combinations(labels, 2)
     }
 
@@ -135,24 +142,34 @@ def panel_permutation_test(
     agents = [a for a in g.agents() if a in agent_panel]
     lab_arr = np.array([agent_panel[a] for a in agents], dtype=object)
 
-    def build(labels_for_agents):
+    def build_portraits(labels_for_agents):
+        """One projection and one portrait per panel, for a single assignment.
+
+        The cache lives for exactly one assignment: reusing portraits across
+        replicates would compare graphs from different random partitions and
+        destroy the null distribution.
+        """
         out = {}
         for lab in labels:
             keep = [a for a, l in zip(agents, labels_for_agents) if l == lab]
-            out[lab] = g.subgraph_agents(keep).project_objects(min_shared)
+            proj = g.subgraph_agents(keep).project_objects(min_shared)
+            out[lab] = portrait_matrix(proj)
         return out
 
-    observed_graphs = build(lab_arr)
+    observed_portraits = build_portraits(lab_arr)
     pairs = list(combinations(labels, 2))
-    obs = {p: portrait_divergence(observed_graphs[p[0]], observed_graphs[p[1]]) for p in pairs}
+    obs = {
+        p: _js_from_portraits(observed_portraits[p[0]], observed_portraits[p[1]])
+        for p in pairs
+    }
 
     rng = np.random.default_rng(seed)
     null = {p: [] for p in pairs}
     for _ in range(n_samples):
         perm = rng.permutation(lab_arr)
-        gn = build(perm)
+        pn = build_portraits(perm)
         for p in pairs:
-            null[p].append(portrait_divergence(gn[p[0]], gn[p[1]]))
+            null[p].append(_js_from_portraits(pn[p[0]], pn[p[1]]))
 
     result = {}
     for p in pairs:
@@ -163,11 +180,17 @@ def panel_permutation_test(
         elif alternative == "less":
             r = int(np.sum(arr <= o))
         else:
-            r = int(np.sum(np.abs(arr - arr.mean()) >= abs(o - arr.mean())))
+            # pooled centring, observed included: see the note in nulls.py, the
+            # replicate-only mean loses the finite-R Type-I guarantee
+            centre = float((arr.sum() + o) / (len(arr) + 1))
+            r = int(np.sum(np.abs(arr - centre) >= abs(o - centre)))
         result[p] = {
             "observed": float(o),
             "null_mean": float(arr.mean()),
             "null_p95": float(np.percentile(arr, 95)),
             "perm_p": float((r + 1) / (n_samples + 1)),
+            "p_resolution": 1.0 / (n_samples + 1),
+            "n_samples": int(n_samples),
+            "min_shared": int(min_shared),
         }
     return result
