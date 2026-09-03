@@ -82,37 +82,7 @@ cache were verified bit-identical to the v1.0.0 outputs.
   1.0.0, re-run it.** The one-sided paths are unchanged, and every result in the
   accompanying manuscript uses `alternative="greater"`, so no published number
   moves. The calibration is in
-  `revision_2026-09/calibrate_two_sided.py` and pinned by
-  `tests/test_v11_regressions.py`.
-
-- **The two-sided permutation p-value was not exact.** Under
-  `alternative="two-sided"`, `null_test` and `panel_permutation_test` measured
-  extremeness from the mean of the replicates alone, leaving the observed value
-  out of the centre. The `(r+1)/(R+1)` estimator is exact only when the ranking
-  is a symmetric function of the pooled set, so this broke the finite-R Type-I
-  guarantee: calibrated under a true null at R = 19 it rejected at 0.062 against
-  a nominal 0.05 on normal data and 0.057 on Poisson counts. Both now centre on
-  the pooled set, observed value included, which holds the level (0.050 and
-  0.046 in the same calibration). **If you reported a two-sided p-value from
-  1.0.0, re-run it.** The one-sided paths are unchanged, and every result in the
-  accompanying manuscript uses `alternative="greater"`, so no published number
-  moves. The calibration is in
-  `revision_2026-09/calibrate_two_sided.py` and pinned by
-  `tests/test_v11_regressions.py`.
-
-- **The two-sided permutation p-value was not exact.** Under
-  `alternative="two-sided"`, `null_test` and `panel_permutation_test` measured
-  extremeness from the mean of the replicates alone, leaving the observed value
-  out of the centre. The `(r+1)/(R+1)` estimator is exact only when the ranking
-  is a symmetric function of the pooled set, so this broke the finite-R Type-I
-  guarantee: calibrated under a true null at R = 19 it rejected at 0.062 against
-  a nominal 0.05 on normal data and 0.057 on Poisson counts. Both now centre on
-  the pooled set, observed value included, which holds the level (0.050 and
-  0.046 in the same calibration). **If you reported a two-sided p-value from
-  1.0.0, re-run it.** The one-sided paths are unchanged, and every result in the
-  accompanying manuscript uses `alternative="greater"`, so no published number
-  moves. The calibration is in
-  `revision_2026-09/calibrate_two_sided.py` and pinned by
+  `benchmarks/validation/calibrate_two_sided.py` and pinned by
   `tests/test_v11_regressions.py`.
 
 ### Changed (behaviour-affecting, please read)
@@ -196,5 +166,7 @@ cache were verified bit-identical to the v1.0.0 outputs.
 - pytest suite, GitHub Actions CI, and four runnable examples via
   `examples/run_all.py`.
 
-[Unreleased]: https://github.com/Waahi/attrimotif/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Waahi/attrimotif/compare/v1.1.1...HEAD
+[1.1.1]: https://github.com/Waahi/attrimotif/compare/v1.1.0...v1.1.1
+[1.1.0]: https://github.com/Waahi/attrimotif/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Waahi/attrimotif/releases/tag/v1.0.0
